@@ -2,8 +2,10 @@
 --
 -- A tooltip under the link: its host, then the whole address (wrapped, up to
 -- two lines), and the keys that act on it (leader o labels every link on the
--- screen: its label copies it, in capitals opens it). An OSC 8 link, whose
--- text says something else than where it points, shows the difference.
+-- screen: its label copies it, in capitals opens it; with openpath.ranma
+-- loaded, ctrl+click opens the link and ctrl+right-click lists what to copy).
+-- An OSC 8 link, whose text says something else than where it points, shows
+-- the difference.
 --
 -- Needs the mouse on (the `mouse` setting, "click" or "hover"). ranma's
 -- plugin API: https://github.com/masshirodev/ranma/blob/main/doc/CONFIG.md ("Tooltips").
@@ -38,6 +40,15 @@ local function wrap(s, width, max)
   return out
 end
 
+-- Ctrl+click on a link is openpath's, so it is offered only when openpath is
+-- loaded: its option exists then, and ranma.get refuses an unknown one.
+local function keys()
+  if pcall(ranma.get, "openpath.editor") then
+    return { { "ctrl+click", "open" }, { "ctrl+right-click", "copy" }, { "leader o", "label all" } }
+  end
+  return { { "leader o", "label, copy or open" } }
+end
+
 ranma.on("hover", function(e)
   if not ranma.get("linkhover.enabled") then return end
   local p = ranma.pane(e.pane)
@@ -53,6 +64,6 @@ ranma.on("hover", function(e)
   ranma.tooltip({ pane = e.pane, line = l.line, col = l.col, span = l.span }, {
     title = host_of(l.url),
     lines = { table.unpack(lines, 1, 3) },
-    keys = { { "leader o", "label, copy or open" } },
+    keys = keys(),
   })
 end)
