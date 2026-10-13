@@ -26,7 +26,8 @@ two lines), and the keys that act on it (leader o labels every link on the
 screen: its label copies it, in capitals opens it; with openpath.ranma
 loaded, ctrl+click opens the link and ctrl+right-click lists what to copy).
 An OSC 8 link, whose text says something else than where it points, shows
-the difference.
+the difference, with the address on one line: a tooltip holds three, keys
+included.
 
 Needs the mouse on (the `mouse` setting, "click" or "hover"). ranma's
 plugin API: https://github.com/masshirodev/ranma/blob/main/doc/CONFIG.md ("Tooltips").

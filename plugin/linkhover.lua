@@ -5,7 +5,8 @@
 -- screen: its label copies it, in capitals opens it; with openpath.ranma
 -- loaded, ctrl+click opens the link and ctrl+right-click lists what to copy).
 -- An OSC 8 link, whose text says something else than where it points, shows
--- the difference.
+-- the difference, with the address on one line: a tooltip holds three, keys
+-- included.
 --
 -- Needs the mouse on (the `mouse` setting, "click" or "hover"). ranma's
 -- plugin API: https://github.com/masshirodev/ranma/blob/main/doc/CONFIG.md ("Tooltips").
@@ -54,16 +55,19 @@ ranma.on("hover", function(e)
   local p = ranma.pane(e.pane)
   local l = p and p:link_at(e.line, e.col)
   if not l then return ranma.tooltip(nil) end
-  local lines = wrap(l.url, WIDTH, 2)
   -- The text the link is drawn as, when it is not the address itself. From
   -- ranma, not a slice of the row: columns count cells, not bytes.
   local shown = l.text or ""
-  if shown ~= "" and shown ~= l.url:sub(1, #shown) then
+  local differs = shown ~= "" and shown ~= l.url:sub(1, #shown)
+  -- ranma takes three lines at most, the keys' line among them: two are
+  -- left, and a "shown as" line takes one of the address's.
+  local lines = wrap(l.url, WIDTH, differs and 1 or 2)
+  if differs then
     table.insert(lines, 1, { { "shown as ", "dim" }, { shown } })
   end
   ranma.tooltip({ pane = e.pane, line = l.line, col = l.col, span = l.span }, {
     title = host_of(l.url),
-    lines = { table.unpack(lines, 1, 3) },
+    lines = lines,
     keys = keys(),
   })
 end)
